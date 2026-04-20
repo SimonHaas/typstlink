@@ -16,7 +16,7 @@
       const queryString = window.location.search;
       const urlParams = new URLSearchParams(queryString);
       const documentUrl = urlParams.get('url');
-      const url = `http://localhost:8080/typst?url=${encodeURIComponent(documentUrl)}`;
+      const url = `https://typstlink.me-bd1.workers.dev/typst?url=${encodeURIComponent(documentUrl)}`;
       const response = await fetch(url);
       const typstContent = await response.text();
       const pdfData = await $typst.pdf({ mainContent: typstContent });
