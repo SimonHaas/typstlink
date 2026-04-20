@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>typstlink</title>
+<script
+  type="module"
+  src="https://cdn.jsdelivr.net/npm/@myriaddreamin/typst-all-in-one.ts/dist/esm/index.js"
+  id="typst"
+></script>
+  </head>
+  <body>
+    <div id="pdf-viewer"></div>
+    <script type="module">
+      const queryString = window.location.search;
+      const urlParams = new URLSearchParams(queryString);
+      const documentUrl = urlParams.get('url');
+      const url = `http://localhost:8080/typst?url=${encodeURIComponent(documentUrl)}`;
+      const response = await fetch(url);
+      const typstContent = await response.text();
+      const pdfData = await $typst.pdf({ mainContent: typstContent });
+      const pdfBlob = new Blob([pdfData], { type: "application/pdf" });
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+
+      import EmbedPDF from "https://cdn.jsdelivr.net/npm/@embedpdf/snippet@2/dist/embedpdf.js";
+
+      EmbedPDF.init({
+        type: "container",
+        target: document.getElementById("pdf-viewer"),
+        src: pdfUrl,
+        theme: { preference: "system" },
+      });
+    </script>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      #pdf-viewer {
+        height: 100vh;
+      }
+    </style>
+  </body>
+</html>
