@@ -23,7 +23,6 @@ export default {
 			corsAllowOrigin = "https://www.typst.link";
 		}
         const corsHeaders = {
-            // 'Access-Control-Allow-Origin': 'https://www.simonhaas.eu',
             'Access-Control-Allow-Origin': corsAllowOrigin,
             'Access-Control-Allow-Methods': 'GET, OPTIONS',
             'Access-Control-Max-Age': '86400',
@@ -46,10 +45,10 @@ export default {
 
         if (!urlParam) {
             return new Response('Missing "url" parameter', { status: 400 });
-        }
+        };
 
         try {
-            const response = await fetch(targetUrl);
+            const response = await fetch(urlParam);
             const text = await response.text();
 
             // 4. Return the response WITH the CORS headers
