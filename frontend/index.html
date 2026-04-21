@@ -41,13 +41,19 @@
 
       if (!documentUrl) {
         console.log("No document URL provided. Using demo content.");
-        // typstContent = '# Welcome to typstlink!\n\nPlease provide a document URL as a query parameter, e.g., ?url=https://example.com/document.typ';
-        // Use a proper newline after the comment and start with Typst syntax
         typstContent = `
           #show link: set text(fill: blue)
           #show link: underline
 
-          Please provide a document URL as a query parameter like 
+          Please provide a document URL as a query parameter.
+          
+          For example:
+
+          When you have a typst document hosted somewhere like
+
+          ${demoFile}
+
+          you can view it by visiting
 
           ${window.location}?url=${demoFile}
         `;
@@ -65,7 +71,6 @@
         console.log(
           "Running in production mode, fetching document from cloudflare worker.",
         );
-        // const url = `https://typstlink.me-bd1.workers.dev/typst?url=${encodeURIComponent(documentUrl)}`;
         const url = `https://worker.typst.link?url=${encodeURIComponent(documentUrl)}`;
       const response = await fetch(url);
         typstContent = await response.text();
