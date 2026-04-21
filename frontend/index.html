@@ -4,28 +4,79 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>typstlink</title>
-<script
+    <!-- <script
   type="module"
   src="https://cdn.jsdelivr.net/npm/@myriaddreamin/typst-all-in-one.ts/dist/esm/index.js"
+  id="typst"
+></script> -->
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@myriaddreamin/typst.ts/dist/esm/contrib/all-in-one-lite.bundle.js"
   id="typst"
 ></script>
   </head>
   <body>
     <div id="pdf-viewer"></div>
     <script type="module">
+      /// Initializes the Typst compiler and renderer. Since we use "all-in-one-lite.bundle.js" instead of
+      /// "all-in-one.bundle.js" we need to tell that the wasm module files can be loaded from CDN (jsdelivr).
+      $typst.setCompilerInitOptions({
+        getModule: () =>
+          "https://cdn.jsdelivr.net/npm/@myriaddreamin/typst-ts-web-compiler/pkg/typst_ts_web_compiler_bg.wasm",
+      });
+      $typst.setRendererInitOptions({
+        getModule: () =>
+          "https://cdn.jsdelivr.net/npm/@myriaddreamin/typst-ts-renderer/pkg/typst_ts_renderer_bg.wasm",
+      });
+
       const queryString = window.location.search;
       const urlParams = new URLSearchParams(queryString);
-      const documentUrl = urlParams.get('url');
+      const documentUrl = urlParams.get("url");
+      console.log("Document URL:", documentUrl);
+
+      const demoFile =
+        "https://raw.githubusercontent.com/echozulucode/typst-examples/refs/heads/main/01-basics.typ";
+
+      let typstContent;
+
+      if (!documentUrl) {
+        console.log("No document URL provided. Using demo content.");
+        // typstContent = '# Welcome to typstlink!\n\nPlease provide a document URL as a query parameter, e.g., ?url=https://example.com/document.typ';
+        // Use a proper newline after the comment and start with Typst syntax
+        typstContent = `
+          #show link: set text(fill: blue)
+          #show link: underline
+
+          Please provide a document URL as a query parameter like 
+
+          ${window.location}?url=${demoFile}
+        `;
+      } else if (
+        location.hostname === "localhost" ||
+        location.hostname === "127.0.0.1"
+      ) {
+        console.log(
+          "Running in development mode, fetching document from local backend.",
+        );
+        const url = `http://127.0.0.1:8787?url=${encodeURIComponent(documentUrl)}`;
+        const response = await fetch(url);
+        typstContent = await response.text();
+      } else {
+        console.log(
+          "Running in production mode, fetching document from cloudflare worker.",
+        );
       const url = `https://typstlink.me-bd1.workers.dev/typst?url=${encodeURIComponent(documentUrl)}`;
       const response = await fetch(url);
-      const typstContent = await response.text();
+        typstContent = await response.text();
+      }
+
       const pdfData = await $typst.pdf({ mainContent: typstContent });
       const pdfBlob = new Blob([pdfData], { type: "application/pdf" });
       const pdfUrl = URL.createObjectURL(pdfBlob);
 
       import EmbedPDF from "https://cdn.jsdelivr.net/npm/@embedpdf/snippet@2/dist/embedpdf.js";
 
-      EmbedPDF.init({
+      const viewer = EmbedPDF.init({
         type: "container",
         target: document.getElementById("pdf-viewer"),
         src: pdfUrl,

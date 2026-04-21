@@ -19,6 +19,7 @@ http
           `http://${process.env.HOST ?? "localhost"}${req.url}`,
         ).searchParams;
         const url = params.get("url");
+        console.log(`Fetching document from URL: ${url}`);
         const response = fetch(url).then((response) =>
           response.text().then((typstContent) => {
             res.write(typstContent);
@@ -27,6 +28,7 @@ http
         );
       }
     } catch (error) {
+      console.log("Error fetching the document:", error);
       res.writeHead(500, {
         "Content-Type": "text/plain",
         "Access-Control-Allow-Origin": "*",

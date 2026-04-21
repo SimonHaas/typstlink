@@ -10,9 +10,19 @@
 
 export default {
     async fetch(request, env, ctx) {
-        // 1. Define your headers
+        const targetUrl = new URL(request.url);
+		console.log({ targetUrl });
+
+		// 1. Define your headers
+		let corsAllowOrigin = null;
+		if (targetUrl.hostname === "www.simonhaas.eu") {
+			corsAllowOrigin = "https://www.simonhaas.eu";
+		} else if (targetUrl.hostname === "typst.link") {
+			corsAllowOrigin = "https://typst.link";
+		}
         const corsHeaders = {
-            'Access-Control-Allow-Origin': 'https://www.simonhaas.eu',
+            // 'Access-Control-Allow-Origin': 'https://www.simonhaas.eu',
+            'Access-Control-Allow-Origin': corsAllowOrigin,
             'Access-Control-Allow-Methods': 'GET, OPTIONS',
             'Access-Control-Max-Age': '86400',
           	'Content-Type': 'text/plain'
@@ -28,10 +38,11 @@ export default {
         }
 
         // 3. Your actual logic
-        console.log(`Received request for ${request.url}`);
-        const targetUrl = new URL(request.url).searchParams.get('url');
 
-        if (!targetUrl) {
+		const searchParams = targetUrl.searchParams;
+		const urlParam = searchParams.get('url');
+
+        if (!urlParam) {
             return new Response('Missing "url" parameter', { status: 400 });
         }
 
