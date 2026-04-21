@@ -19,6 +19,8 @@ export default {
 			corsAllowOrigin = "https://www.simonhaas.eu";
 		} else if (targetUrl.hostname === "typst.link") {
 			corsAllowOrigin = "https://typst.link";
+		} else if (targetUrl.hostname === "www.typst.link") {
+			corsAllowOrigin = "https://www.typst.link";
 		}
         const corsHeaders = {
             // 'Access-Control-Allow-Origin': 'https://www.simonhaas.eu',
